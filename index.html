@@ -104,6 +104,31 @@
                         <p class="subtitle">Crie e acompanhe os horários dos seus clientes.</p>
                     </div><button class="primary" data-action="appointment">＋ Novo agendamento</button>
                 </div>
+                <section class="panel calendar-panel" aria-label="Calendário de agendamentos">
+                    <div class="calendar-heading">
+                        <div>
+                            <h2>Calendário de agendamentos</h2>
+                            <p class="calendar-hint">Selecione um dia para consultar os horários.</p>
+                        </div>
+                        <div class="calendar-controls">
+                            <button type="button" class="mini" id="calendarPrev" aria-label="Mês anterior">‹</button>
+                            <strong id="calendarMonth" aria-live="polite"></strong>
+                            <button type="button" class="mini" id="calendarNext" aria-label="Próximo mês">›</button>
+                            <button type="button" class="mini" id="calendarToday">Hoje</button>
+                        </div>
+                    </div>
+                    <div class="calendar-weekdays" aria-hidden="true">
+                        <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
+                    </div>
+                    <div id="calendarGrid" class="calendar-grid" role="group" aria-label="Dias do mês"></div>
+                    <div class="calendar-day-details">
+                        <div class="calendar-details-heading">
+                            <h3 id="calendarSelectedLabel">Agendamentos do dia</h3>
+                            <button type="button" class="mini" id="calendarNew">＋ Agendar neste dia</button>
+                        </div>
+                        <div id="calendarDayList"></div>
+                    </div>
+                </section>
                 <section class="panel">
                     <div class="toolbar"><input id="searchAppointments" placeholder="Buscar cliente ou serviço..."
                             aria-label="Buscar agendamentos"><select id="filterStatus" aria-label="Filtrar status">

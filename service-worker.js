@@ -1,4 +1,4 @@
-const CACHE_NAME = "agenda-servicos-pwa-v1";
+const CACHE_NAME = "agenda-servicos-pwa-v2";
 const APP_SHELL = [
   "./",
   "./index.html",

@@ -181,6 +181,64 @@
       );
     return `<table class="table"><thead><tr><th>Cliente / serviço</th><th>Data e hora</th><th>Status</th>${compact ? "" : "<th>Ações</th>"}</tr></thead><tbody>${list.map((a) => `<tr><td>${esc(who(a))}<span class="sub">${esc(what(a))}</span></td><td>${date(a.date)}<span class="sub">${esc(a.time)}</span></td><td>${badge(a.status)}</td>${compact ? "" : `<td>${buttons("appointment", a.id)}</td>`}</tr>`).join("")}</tbody></table>`;
   }
+  // Calendário mensal: lê os mesmos agendamentos salvos no localStorage.
+  let calendarYear = Number(today.slice(0, 4));
+  let calendarMonth = Number(today.slice(5, 7)) - 1;
+  let calendarSelected = today;
+
+  function localDateKey(year, month, day) {
+    const d = new Date(year, month, day);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${dd}`;
+  }
+
+  function renderCalendar() {
+    const grid = $("#calendarGrid");
+    if (!grid) return;
+
+    const firstDay = new Date(calendarYear, calendarMonth, 1).getDay();
+    const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+    const monthName = new Date(calendarYear, calendarMonth, 1)
+      .toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
+    $("#calendarMonth").textContent =
+      monthName.charAt(0).toUpperCase() + monthName.slice(1);
+
+    const counts = new Map();
+    for (const a of db.appointments) {
+      counts.set(a.date, (counts.get(a.date) || 0) + 1);
+    }
+
+    const cells = [];
+    for (let i = 0; i < firstDay; i++) {
+      cells.push('<span class="calendar-blank" aria-hidden="true"></span>');
+    }
+    for (let day = 1; day <= daysInMonth; day++) {
+      const key = localDateKey(calendarYear, calendarMonth, day);
+      const count = counts.get(key) || 0;
+      const selected = key === calendarSelected;
+      const isToday = key === today;
+      cells.push(`<button type="button" class="calendar-day${selected ? " selected" : ""}${isToday ? " today" : ""}" data-calendar-date="${key}" aria-pressed="${selected}" aria-label="${date(key)}: ${count} agendamento(s)">
+        <span>${day}</span>${count ? `<small>${count}</small>` : ""}
+      </button>`);
+    }
+    grid.innerHTML = cells.join("");
+
+    $("#calendarSelectedLabel").textContent =
+      `Agendamentos de ${date(calendarSelected)}`;
+    const list = sorted(db.appointments.filter(a => a.date === calendarSelected));
+    $("#calendarDayList").innerHTML = list.length
+      ? `<div class="calendar-entries">${list.map(a => `
+          <div class="calendar-entry">
+            <div><strong>${esc(a.time)} · ${esc(who(a))}</strong>
+              <span>${esc(what(a))}</span></div>
+            ${badge(a.status)}
+            <button type="button" class="mini" data-edit="appointment" data-id="${esc(a.id)}">Editar</button>
+          </div>`).join("")}</div>`
+      : empty("Dia sem agendamentos", "Selecione outra data ou crie um novo horário.");
+  }
+
   function render() {
     const ap = db.appointments.filter(
       (a) => a.date === today && a.status !== "Cancelado",
@@ -239,6 +297,7 @@
           "Nenhum serviço encontrado",
           "Cadastre um serviço para usar nos agendamentos.",
         );
+    renderCalendar();
   }
   function navigate(view) {
     const names = {
@@ -550,6 +609,35 @@
       render,
     ),
   );
+  $("#calendarPrev").addEventListener("click", () => {
+    calendarMonth--;
+    if (calendarMonth < 0) { calendarMonth = 11; calendarYear--; }
+    calendarSelected = localDateKey(calendarYear, calendarMonth, 1);
+    renderCalendar();
+  });
+  $("#calendarNext").addEventListener("click", () => {
+    calendarMonth++;
+    if (calendarMonth > 11) { calendarMonth = 0; calendarYear++; }
+    calendarSelected = localDateKey(calendarYear, calendarMonth, 1);
+    renderCalendar();
+  });
+  $("#calendarToday").addEventListener("click", () => {
+    calendarYear = Number(today.slice(0, 4));
+    calendarMonth = Number(today.slice(5, 7)) - 1;
+    calendarSelected = today;
+    renderCalendar();
+  });
+  $("#calendarGrid").addEventListener("click", (event) => {
+    const day = event.target.closest("[data-calendar-date]");
+    if (!day) return;
+    calendarSelected = day.dataset.calendarDate;
+    renderCalendar();
+  });
+  $("#calendarNew").addEventListener("click", () => {
+    open("appointment");
+    const input = $("#f-date");
+    if (input) input.value = calendarSelected;
+  });
   $("#menu").onclick = () => $("#sidebar").classList.toggle("open");
   $("#todayLabel").textContent = new Date().toLocaleDateString("pt-BR", {
     weekday: "short",
