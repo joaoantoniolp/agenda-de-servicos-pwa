@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#6d4aff">
+    <meta name="description" content="Organize clientes, serviços e agendamentos em um só lugar.">
+    <title>Agenda — Gestão de Serviços</title>
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" href="./icons/icon-192.png">
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+    <div class="shell">
+        <aside class="sidebar" id="sidebar"><a class="brand" href="#" data-view="dashboard"><span
+                    class="logo">A</span><span><b>agenda</b><small>GESTÃO DE SERVIÇOS</small></span></a>
+            <p class="nav-label">MENU PRINCIPAL</p>
+            <nav><button class="nav active" data-view="dashboard">▦ <span>Visão geral</span></button><button class="nav"
+                    data-view="appointments">▣ <span>Agendamentos</span><em id="navCount">0</em></button><button
+                    class="nav" data-view="clients">♙ <span>Clientes</span></button><button class="nav"
+                    data-view="services">✧ <span>Serviços</span></button></nav>
+            <div class="sidebar-foot"><i></i><span><b>Dados neste dispositivo</b><small>Salvos no
+                        navegador</small></span></div><button id="install" class="nav install" hidden>⇩ <span>Instalar
+                    aplicativo</span></button>
+        </aside>
+        <main>
+            <header class="topbar"><button id="menu" class="mobile-menu" aria-label="Abrir menu">☰</button>
+                <div class="crumb">Workspace <span>/</span> <b id="crumb">Visão geral</b></div>
+                <div class="top-right"><span id="todayLabel"></span>
+                    <div class="avatar">AG</div>
+                </div>
+            </header>
+            <section class="view active" id="view-dashboard">
+                <div class="heading">
+                    <div>
+                        <p class="eyebrow">SEU NEGÓCIO, EM ORDEM</p>
+                        <h1>Visão geral</h1>
+                        <p class="subtitle">Acompanhe sua agenda e mantenha tudo funcionando.</p>
+                    </div><button class="primary" data-action="appointment">＋ Novo agendamento</button>
+                </div>
+                <div class="stats">
+                    <article>
+                        <div>Agendamentos hoje <span class="bubble purple">▣</span></div><strong
+                            id="statToday">0</strong><small>Compromissos para hoje</small>
+                    </article>
+                    <article>
+                        <div>Em aberto <span class="bubble orange">◷</span></div><strong
+                            id="statOpen">0</strong><small>Aguardando atendimento</small>
+                    </article>
+                    <article>
+                        <div>Clientes cadastrados <span class="bubble blue">♙</span></div><strong
+                            id="statClients">0</strong><small>Na sua base de clientes</small>
+                    </article>
+                    <article>
+                        <div>Serviços ativos <span class="bubble green">✧</span></div><strong
+                            id="statServices">0</strong><small>Disponíveis para agendamento</small>
+                    </article>
+                </div>
+                <div class="columns">
+                    <section class="panel">
+                        <div class="panel-head">
+                            <div>
+                                <h2>Próximos agendamentos</h2>
+                                <p>Confira os compromissos mais próximos.</p>
+                            </div><button class="link" data-view="appointments">Ver todos →</button>
+                        </div>
+                        <div id="dashboardTable" class="table-wrap"></div>
+                    </section>
+                    <section class="panel">
+                        <div class="panel-head">
+                            <div>
+                                <h2>Acesso rápido</h2>
+                                <p>O que você precisa fazer?</p>
+                            </div>
+                        </div><button class="quick" data-action="appointment"><span
+                                class="bubble purple">＋</span><span><b>Novo agendamento</b><small>Reserve um horário
+                                    para um cliente</small></span>→</button><button class="quick"
+                            data-action="client"><span class="bubble blue">♙</span><span><b>Cadastrar
+                                    cliente</b><small>Adicione alguém à sua base</small></span>→</button><button
+                            class="quick" data-action="service"><span class="bubble green">✧</span><span><b>Cadastrar
+                                    serviço</b><small>Defina um serviço oferecido</small></span>→</button><button
+                            class="quick-action" id="testNotification">
+                            <span class="quick-icon purple">♧</span>
+                            <span>
+                                <strong>Testar notificação</strong>
+                                <small>Verifique se o navegador permite notificações</small>
+                            </span>
+                            <span class="quick-arrow">→</span>
+                        </button>
+                        <div class="tip"><b>✦ Dica rápida</b>
+                            <p>Os dados ficam salvos neste navegador. Faça cópias de segurança das informações
+                                importantes.</p>
+                        </div>
+                    </section>
+                </div>
+            </section>
+            <section class="view" id="view-appointments">
+                <div class="heading">
+                    <div>
+                        <p class="eyebrow">ORGANIZAÇÃO DO TEMPO</p>
+                        <h1>Agendamentos</h1>
+                        <p class="subtitle">Crie e acompanhe os horários dos seus clientes.</p>
+                    </div><button class="primary" data-action="appointment">＋ Novo agendamento</button>
+                </div>
+                <section class="panel">
+                    <div class="toolbar"><input id="searchAppointments" placeholder="Buscar cliente ou serviço..."
+                            aria-label="Buscar agendamentos"><select id="filterStatus" aria-label="Filtrar status">
+                            <option value="all">Todos os status</option>
+                            <option>Agendado</option>
+                            <option>Concluído</option>
+                            <option>Cancelado</option>
+                        </select><input type="date" id="filterDate" aria-label="Filtrar por data"></div>
+                    <div id="appointmentsTable" class="table-wrap"></div>
+                </section>
+            </section>
+            <section class="view" id="view-clients">
+                <div class="heading">
+                    <div>
+                        <p class="eyebrow">RELACIONAMENTO</p>
+                        <h1>Clientes</h1>
+                        <p class="subtitle">Mantenha as informações organizadas.</p>
+                    </div><button class="primary" data-action="client">＋ Novo cliente</button>
+                </div>
+                <section class="panel">
+                    <div class="toolbar"><input id="searchClients" placeholder="Buscar nome, e-mail ou telefone..."
+                            aria-label="Buscar clientes"><span id="clientCount" class="muted"></span></div>
+                    <div id="clientsTable" class="table-wrap"></div>
+                </section>
+            </section>
+            <section class="view" id="view-services">
+                <div class="heading">
+                    <div>
+                        <p class="eyebrow">SEU CATÁLOGO</p>
+                        <h1>Serviços</h1>
+                        <p class="subtitle">Gerencie os serviços disponíveis para agendamento.</p>
+                    </div><button class="primary" data-action="service">＋ Novo serviço</button>
+                </div>
+                <section class="panel">
+                    <div class="toolbar"><input id="searchServices" placeholder="Buscar serviço..."
+                            aria-label="Buscar serviços"><span id="serviceCount" class="muted"></span></div>
+                    <div id="servicesTable" class="table-wrap"></div>
+                </section>
+            </section>
+            <footer>Agenda de Serviços <span>● Aplicativo pronto para organizar seu dia</span></footer>
+        </main>
+    </div>
+    <div id="backdrop" class="backdrop" hidden>
+        <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <div class="modal-head">
+                <div>
+                    <p class="eyebrow" id="modalEyebrow">NOVO REGISTRO</p>
+                    <h2 id="modalTitle">Novo registro</h2>
+                </div><button id="closeModal" class="close" aria-label="Fechar">×</button>
+            </div>
+            <form id="form">
+                <div id="fields" class="fields"></div>
+                <p id="formError" class="error" role="alert"></p>
+                <div class="modal-actions"><button type="button" id="cancelModal"
+                        class="secondary">Cancelar</button><button class="primary" type="submit"
+                        id="saveBtn">Salvar</button></div>
+            </form>
+        </section>
+    </div>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="./app.js" defer></script>
+</body>
+
+</html>
